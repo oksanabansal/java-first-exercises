@@ -6,8 +6,10 @@ import oksana.java.exercises.first.entities.AddressEntity;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,7 +59,7 @@ public class AddressRepository {
         try {
             final String newLine = System.getProperty("line.separator");
             Files.writeString(Paths.get(systemConfiguration.getProperty("oksana.exercise.first.db.file.path")),
-                    addressEntity+newLine,
+                    addressEntity + newLine,
                     StandardOpenOption.APPEND);
         } catch (IOException e) {
             throw e;
@@ -65,6 +67,13 @@ public class AddressRepository {
     }
 
     public List<AddressEntity> getAllAddresses() throws IOException {
-        return Files.readAllLines(Paths.get(systemConfiguration.getProperty("oksana.exercise.first.db.file.path"))).stream().map(this::convertCSVLineToAddressEntity).collect(Collectors.toList());
+        final List<AddressEntity> allAddresses = new ArrayList<>();
+        final Path dataBaseFile = Paths.get(systemConfiguration.getProperty("oksana.exercise.first.db.file.path"));
+        final List<String> addressesAsLines = Files.readAllLines(dataBaseFile);
+        for (String address : addressesAsLines) {
+            AddressEntity addressEntity = convertCSVLineToAddressEntity(address);
+            allAddresses.add(addressEntity);
+        }
+        return allAddresses;
     }
 }
